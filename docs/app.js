@@ -93,7 +93,7 @@
   }
 
   function draw() {
-    if (!tex) return;
+    if (!tex || !W || !H) return;
     const time = reduce ? 0 : performance.now() / 1000;
     ctx.clearRect(0, 0, W, H);
     ctx.drawImage(tex, 0, 0);
@@ -121,6 +121,8 @@
     sc = Math.min(devicePixelRatio || 1, 1.5);
     const nw = Math.round(hero.clientWidth * sc), nh = Math.round(hero.clientHeight * sc);
     if (tex && nw === W && nh === H) return;
+    // вкладка в фоне или ещё не разложена: размеры 0 — ждём resize, иначе drawImage падает и останавливает весь скрипт
+    if (!nw || !nh) { tex = null; return; }
     W = frostEl.width = nw; H = frostEl.height = nh;
     tex = frostTexture();
     trail = mk(); trail.width = W; trail.height = H; tctx = trail.getContext('2d');
@@ -153,6 +155,8 @@
 
   let rt;
   addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { build(); if (reduce) draw(); }, 150); });
+  // размер Hero может появиться без события resize (вкладка была скрыта)
+  if ('ResizeObserver' in window) new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(() => { build(); if (reduce) draw(); }, 150); }).observe(hero);
 
   /* ---------- Открытие ---------- */
   const h1 = $('h1', hero), lines = gsap.utils.toArray('.line__in', h1);
