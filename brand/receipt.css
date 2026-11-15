@@ -1,0 +1,58 @@
+/* Чек «Место гедониста» — термобумага из щели принтера.
+   Использование: .printer > .printer__slot + .printer__feed > .receipt */
+@font-face { font-family: "PT Mono"; src: url("../docs/vendor/fonts/PTM55FT.ttf") format("truetype"); font-display: swap; }
+
+.printer { --paper: #F4F1E8; --ink: #222; --w: 19rem; position: relative; width: calc(var(--w) + 1.5rem); }
+.printer__slot {
+  position: relative; z-index: 2; height: 0.95rem; border-radius: 0.45rem 0.45rem 0.25rem 0.25rem;
+  background: linear-gradient(#3a3d42, #1d1f23 55%, #121315);
+  box-shadow: 0 1px 0 rgba(255,255,255,.12) inset, 0 6px 14px -6px rgba(0,0,0,.7);
+}
+.printer__slot::after { /* щель */
+  content: ""; position: absolute; left: 0.75rem; right: 0.75rem; bottom: 0.22rem; height: 2px; border-radius: 2px; background: #050505;
+}
+.printer__feed { position: relative; margin: -0.3rem 0.75rem 0; overflow: hidden; padding-bottom: 1.5rem; }
+
+.receipt {
+  position: relative; box-sizing: border-box; width: var(--w); padding: 1.1rem 1.05rem 1.25rem; color: var(--ink);
+  font: 400 0.78rem/1.5 "PT Mono", ui-monospace, monospace; letter-spacing: 0.02em; text-transform: uppercase;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.05), transparent 9%, transparent 91%, rgba(0,0,0,.06)),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .055 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+    var(--paper);
+  filter: drop-shadow(0 12px 16px rgba(0,0,0,.38));
+  transform-origin: 50% 0;
+}
+.receipt::after { /* рваный зубчатый низ */
+  content: ""; position: absolute; left: 0; right: 0; bottom: -7px; height: 8px;
+  background:
+    linear-gradient(-45deg, transparent 5.5px, var(--paper) 0) 0 0 / 11px 8px repeat-x,
+    linear-gradient(45deg, transparent 5.5px, var(--paper) 0) 0 0 / 11px 8px repeat-x;
+}
+.receipt p { margin: 0; }
+.receipt .ink { opacity: .9; text-shadow: 0 0 .35px currentColor; } /* термопечать чуть расплывается */
+.receipt__logo { display: block; width: 3.6rem; margin: 0 auto 0.35rem; }
+.receipt__c { text-align: center; }
+.receipt__name { font-size: 0.9rem; letter-spacing: 0.12em; }
+.receipt__hr { margin: 0.45rem 0; border: 0; border-top: 1px dashed rgba(0,0,0,.55); }
+.receipt__hr--double { border-top: 3px double rgba(0,0,0,.7); }
+.receipt__row { display: flex; justify-content: space-between; gap: 0.75rem; white-space: nowrap; }
+.receipt__qty { padding-left: 1.2em; opacity: .8; }
+.receipt__total { margin: 0.35rem 0 0.55rem; font-size: 0.98rem; transform: scaleY(1.85); transform-origin: 0 50%; letter-spacing: 0.04em; }
+.receipt__total span:last-child { font-weight: 700; }
+.receipt__qr { display: grid; grid-template-columns: 5.4rem 1fr; gap: 0.75rem; align-items: center; margin: 0.5rem 0; }
+.receipt__qr img { width: 5.4rem; height: 5.4rem; image-rendering: pixelated; }
+.receipt__small { font-size: 0.66rem; line-height: 1.4; opacity: .75; }
+
+/* состояние «строка печатается» */
+.receipt__line { overflow: hidden; }
+.receipt__line[data-new] { animation: print-line .32s steps(4, end) both; }
+@keyframes print-line { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0); } }
+
+/* мобильный корешок: только итог */
+.stub { --paper: #F4F1E8; position: relative; display: inline-flex; gap: 0.75rem; align-items: baseline; padding: 0.55rem 0.8rem 0.7rem;
+  font: 400 0.8rem/1 "PT Mono", monospace; text-transform: uppercase; letter-spacing: .03em; color: #222; background: var(--paper);
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,.4)); }
+.stub::after { content: ""; position: absolute; left: 0; right: 0; bottom: -6px; height: 7px;
+  background: linear-gradient(-45deg, transparent 4.5px, var(--paper) 0) 0 0 / 9px 7px repeat-x, linear-gradient(45deg, transparent 4.5px, var(--paper) 0) 0 0 / 9px 7px repeat-x; }
+.stub b { font-size: 1rem; transform: scaleY(1.6); display: inline-block; }
