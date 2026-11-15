@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ru" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Место гедониста — дом с баней и чаном, Сингапай</title>
+<meta name="description" content="Дом с баней и чаном в 10 минутах от Нефтеюганска. Целиком на вашу компанию, до 25 гостей.">
+<meta name="theme-color" content="#0D1A28">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBEMUEyOCIvPjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjciIGZpbGw9IiNCODMwMUYiLz48L3N2Zz4=">
+<script>document.documentElement.classList.add('is-loading');</script>
+<link rel="stylesheet" href="styles.css?v=2">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/build/three.module.js", "three/addons/": "./vendor/three/addons/" } }
+</script>
+<script src="vendor/gsap/gsap.min.js?v=1" defer></script>
+<script src="vendor/gsap/ScrollTrigger.min.js?v=1" defer></script>
+<script src="app.js?v=2" defer></script>
+</head>
+<body>
+
+<div class="demo-banner">Демо-концепт сайта для&nbsp;«Места гедониста». Пока не&nbsp;официальный сайт базы.</div>
+
+<div class="thermo" aria-hidden="true">
+  <div class="thermo__read"><span class="thermo__num">−27°</span><span class="thermo__label">улица</span></div>
+  <div class="thermo__scale"><i class="thermo__merc"></i></div>
+</div>
+
+<main>
+  <section id="hero" class="hero">
+    <picture class="hero__bg">
+      <source media="(max-width: 900px)" srcset="assets/img/hero-hall-900.webp?v=1">
+      <img src="assets/img/hero-hall.webp?v=1" alt="" width="2200" height="1467" fetchpriority="high">
+    </picture>
+    <canvas class="frost" aria-hidden="true"></canvas>
+    <div class="hero__fade">
+      <header class="topbar">
+        <a class="topbar__logo" href="#hero">Место гедониста</a>
+        <nav class="topbar__nav" aria-label="Основная">
+          <ul>
+            <li><a href="#uchastok">Участок</a></li>
+            <li><a href="#dalshe">Дом</a></li>
+            <li><a href="#dalshe">Баня и&nbsp;чан</a></li>
+            <li><a href="#dalshe">Цены</a></li>
+            <li><a href="#dalshe">Дорога</a></li>
+          </ul>
+        </nav>
+        <p class="topbar__where">Сингапай, 10&nbsp;минут от&nbsp;Нефтеюганска</p>
+      </header>
+      <div class="hero__text">
+        <h1><span class="line"><span class="line__in">Место</span></span> <span class="line"><span class="line__in">гедониста</span></span></h1>
+        <p class="hero__lead">Дом с&nbsp;баней и&nbsp;чаном в&nbsp;10&nbsp;минутах от&nbsp;Нефтеюганска. Целиком на&nbsp;вашу компанию, до&nbsp;25&nbsp;гостей.</p>
+        <div class="hero__row">
+          <a class="btn" href="#uchastok">Собрать свой отдых</a>
+          <a class="hero__link" href="#uchastok">Посмотреть участок&nbsp;<span class="arrow" aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+      <p class="hero__hint"><span class="hint-fine">Проведите по&nbsp;стеклу, оно оттает</span><span class="hint-coarse">Листайте, стекло оттает</span></p>
+    </div>
+  </section>
+
+  <section id="uchastok" class="plot" data-stage="0">
+    <h2 class="visually-hidden">Участок: дом, баня и&nbsp;чан</h2>
+    <div class="scene3d" role="group" aria-label="Объёмный макет участка: дом с верандой, баня и чан среди сосен">
+      <img class="scene3d__poster" src="assets/img/scene-poster.webp?v=2" alt="" width="1430" height="900">
+      <canvas class="scene3d__canvas" aria-hidden="true"></canvas>
+      <button class="hotspot" type="button" data-go="1">Дом</button>
+      <button class="hotspot" type="button" data-go="2">Баня</button>
+      <button class="hotspot" type="button" data-go="3">Чан</button>
+    </div>
+
+    <div class="plot__text">
+      <article class="stage" data-i="0">
+        <p class="stage__temp">−27°&nbsp;·&nbsp;улица</p>
+        <h3>Весь участок на&nbsp;одну компанию</h3>
+        <p class="stage__text">Дом, отдельная баня и&nbsp;чан под&nbsp;открытым небом. Рядом сосны и&nbsp;небольшое озеро, соседей за&nbsp;забором нет. Посёлок Сингапай, территория КФХ&nbsp;«Рута».</p>
+        <p class="stage__hint">Листайте или нажмите на&nbsp;дом, баню или чан</p>
+      </article>
+
+      <article class="stage" data-i="1">
+        <p class="stage__temp">+24°&nbsp;·&nbsp;дом</p>
+        <h3>Зал с&nbsp;фермами под&nbsp;крышей</h3>
+        <p class="stage__text">Панорамные окна, проектор, кухня с&nbsp;посудомойкой и&nbsp;две спальни. Дом вмещает до&nbsp;25&nbsp;гостей, ночевать остаются шестеро.</p>
+        <p class="stage__price">Сутки&nbsp;— <b class="num">15&nbsp;000&nbsp;₽</b> в&nbsp;будни, <b class="num">20&nbsp;000&nbsp;₽</b> с&nbsp;пятницы по&nbsp;воскресенье и&nbsp;в&nbsp;праздники</p>
+        <figure class="stage__fig">
+          <img src="assets/img/hall.webp?v=1" alt="" width="144" height="144" loading="lazy">
+          <figcaption>Зал. Фото летнее</figcaption>
+        </figure>
+      </article>
+
+      <article class="stage" data-i="2">
+        <p class="stage__temp">+90°&nbsp;·&nbsp;парная</p>
+        <h3>Баня стоит отдельно</h3>
+        <p class="stage__text">От&nbsp;дома к&nbsp;ней идёшь по&nbsp;снегу, обратно бежишь. Гости в&nbsp;отзывах называют её шикарной.</p>
+        <p class="stage__price"><b class="num">+4&nbsp;000&nbsp;₽</b> к&nbsp;аренде, в&nbsp;любой&nbsp;день</p>
+        <button class="toggle" type="button" data-item="banya" aria-pressed="false">Добавить баню</button>
+        <figure class="stage__fig">
+          <img src="assets/img/banya.webp?v=1" alt="" width="144" height="144" loading="lazy">
+          <figcaption>Баня. Фото летнее</figcaption>
+        </figure>
+      </article>
+
+      <article class="stage" data-i="3">
+        <p class="stage__temp">+38°&nbsp;·&nbsp;чан</p>
+        <h3>В&nbsp;чане сидят до&nbsp;ночи</h3>
+        <p class="stage__text">Чан стоит на&nbsp;настиле рядом с&nbsp;баней. Над головой небо и&nbsp;сосны, вокруг минус, в&nbsp;воде плюс.</p>
+        <p class="stage__price"><b class="num">+4&nbsp;000&nbsp;₽</b> к&nbsp;аренде, в&nbsp;любой&nbsp;день</p>
+        <button class="toggle" type="button" data-item="chan" aria-pressed="false">Добавить чан</button>
+        <figure class="stage__fig">
+          <img src="assets/img/chan.webp?v=1" alt="" width="144" height="144" loading="lazy">
+          <figcaption>Чан. Фото летнее</figcaption>
+        </figure>
+      </article>
+    </div>
+
+    <aside class="bill" aria-live="polite">
+      <p class="bill__title">Счёт</p>
+      <ul class="bill__rows">
+        <li><span>Дом, сутки в&nbsp;будни</span><i aria-hidden="true"></i><b class="num">15&nbsp;000&nbsp;₽</b></li>
+        <li data-row="banya" hidden><span>Баня</span><i aria-hidden="true"></i><b class="num">4&nbsp;000&nbsp;₽</b></li>
+        <li data-row="chan" hidden><span>Чан</span><i aria-hidden="true"></i><b class="num">4&nbsp;000&nbsp;₽</b></li>
+      </ul>
+      <p class="bill__total">Итого&nbsp;— <b class="num" data-total>15&nbsp;000&nbsp;₽</b></p>
+      <p class="bill__note">До&nbsp;15&nbsp;гостей. Выходные и&nbsp;почасовая аренда считаются в&nbsp;подборе.</p>
+    </aside>
+
+    <p class="plot__note">Температуры на&nbsp;шкале условные, для&nbsp;настроения. Макет упрощён, расстояния не&nbsp;в&nbsp;масштабе.</p>
+  </section>
+
+  <section id="dalshe" class="next">
+    <h2>Дальше по&nbsp;шкале</h2>
+    <p>Здесь появятся дом внутри, баня и&nbsp;чан крупным планом, подбор отдыха со&nbsp;счётом, отзывы гостей с&nbsp;Яндекс&nbsp;Карт и&nbsp;дорога. Сейчас готовы первый экран и&nbsp;макет участка.</p>
+    <a class="btn" href="https://max.ru/u/f9LHodD0cOLaY0QWOI_nVbSbi6RzxVHj2z8PKyE7IdGz8zfiN4PkCBS8Sq8" target="_blank" rel="noopener">Написать автору демо</a>
+    <p class="plot__note plot__note--next">Температуры на&nbsp;шкале условные, для&nbsp;настроения. Макет упрощён, расстояния не&nbsp;в&nbsp;масштабе.</p>
+  </section>
+</main>
+
+</body>
+</html>
