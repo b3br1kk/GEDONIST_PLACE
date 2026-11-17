@@ -8,129 +8,170 @@
 <meta name="theme-color" content="#0D1A28">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBEMUEyOCIvPjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjciIGZpbGw9IiNCODMwMUYiLz48L3N2Zz4=">
 <script>document.documentElement.classList.add('is-loading');</script>
-<link rel="stylesheet" href="styles.css?v=2">
-<script type="importmap">
-{ "imports": { "three": "./vendor/three/build/three.module.js", "three/addons/": "./vendor/three/addons/" } }
-</script>
+<link rel="preload" as="image" href="assets/img/fly-first-1600.webp?v=1" imagesrcset="assets/img/fly-first-960.webp?v=1 960w, assets/img/fly-first-1600.webp?v=1 1600w" imagesizes="(max-aspect-ratio: 16/10) 160vh, 100vw">
+<link rel="stylesheet" href="styles.css?v=3">
 <script src="vendor/gsap/gsap.min.js?v=1" defer></script>
-<script src="vendor/gsap/ScrollTrigger.min.js?v=1" defer></script>
-<script src="app.js?v=3" defer></script>
+<script src="app.js?v=4" defer></script>
 </head>
 <body>
 
 <div class="demo-banner">Демо-концепт сайта для&nbsp;«Места гедониста». Пока не&nbsp;официальный сайт базы.</div>
 
 <div class="thermo" aria-hidden="true">
-  <div class="thermo__read"><span class="thermo__num">−27°</span><span class="thermo__label">улица</span></div>
+  <div class="thermo__read"><span class="thermo__num">+24°</span><span class="thermo__label">зал</span></div>
   <div class="thermo__scale"><i class="thermo__merc"></i></div>
 </div>
 
 <main>
-  <section id="hero" class="hero">
-    <picture class="hero__bg">
-      <source media="(max-width: 900px)" srcset="assets/img/hero-hall-900.webp?v=1">
-      <img src="assets/img/hero-hall.webp?v=1" alt="" width="2200" height="1467" fetchpriority="high">
-    </picture>
-    <canvas class="frost" aria-hidden="true"></canvas>
-    <div class="hero__fade">
-      <header class="topbar">
-        <a class="topbar__logo" href="#hero">Место гедониста</a>
-        <nav class="topbar__nav" aria-label="Основная">
-          <ul>
-            <li><a href="#uchastok">Участок</a></li>
-            <li><a href="#dalshe">Дом</a></li>
-            <li><a href="#dalshe">Баня и&nbsp;чан</a></li>
-            <li><a href="#dalshe">Цены</a></li>
-            <li><a href="#dalshe">Дорога</a></li>
-          </ul>
-        </nav>
-        <p class="topbar__where">Сингапай, 10&nbsp;минут от&nbsp;Нефтеюганска</p>
-      </header>
-      <div class="hero__text">
-        <h1><span class="line"><span class="line__in">Место</span></span> <span class="line"><span class="line__in">гедониста</span></span></h1>
-        <p class="hero__lead">Дом с&nbsp;баней и&nbsp;чаном в&nbsp;10&nbsp;минутах от&nbsp;Нефтеюганска. Целиком на&nbsp;вашу компанию, до&nbsp;25&nbsp;гостей.</p>
-        <div class="hero__row">
-          <a class="btn" href="#uchastok">Собрать свой отдых</a>
-          <a class="hero__link" href="#uchastok">Посмотреть участок&nbsp;<span class="arrow" aria-hidden="true">↓</span></a>
+  <section id="dvor" class="stand" data-state="hall" aria-label="Дом и двор">
+      <div class="map__head">
+        <h2 tabindex="-1">Двор на&nbsp;одну компанию</h2>
+        <p><span class="hint-fine">Наведите на&nbsp;постройку или нажмите на&nbsp;неё.</span><span class="hint-coarse">Двигайте картинку вбок и&nbsp;нажимайте на&nbsp;постройки.</span></p>
+      </div>
+
+    <div class="stand__frame">
+      <div class="stand__media">
+        <img class="stand__last" srcset="assets/img/fly-last-960.webp?v=1 960w, assets/img/fly-last-1600.webp?v=1 1600w" sizes="(max-aspect-ratio: 16/10) 160vh, 100vw" src="assets/img/fly-last-1600.webp?v=1" alt="" width="1600" height="1000" loading="lazy" decoding="async">
+        <video class="stand__video" muted playsinline disablepictureinpicture disableremoteplayback preload="none" aria-hidden="true" tabindex="-1"></video>
+        <img class="stand__poster" srcset="assets/img/fly-first-960.webp?v=1 960w, assets/img/fly-first-1600.webp?v=1 1600w" sizes="(max-aspect-ratio: 16/10) 160vh, 100vw" src="assets/img/fly-first-1600.webp?v=1" alt="Зал дома вечером: низкий диван буквой Г, кухня со шторками, фермы под крышей" width="1600" height="1000" fetchpriority="high">
+        <div class="glows" aria-hidden="true">
+          <span class="glow" data-k="house"><i class="glow__fill"></i><i class="glow__rim"></i></span>
+          <span class="glow" data-k="terrace"><i class="glow__fill"></i><i class="glow__rim"></i></span>
+          <span class="glow" data-k="banya"><i class="glow__fill"></i><i class="glow__rim"></i></span>
+          <span class="glow" data-k="chan"><i class="glow__fill"></i><i class="glow__rim"></i></span>
+        </div>
+        <div class="pins">
+          <button class="pin" type="button" data-k="house" style="--x:76%;--y:19%" aria-controls="card-house" aria-expanded="false"><span class="pin__t">Дом</span><b class="pin__deg num">+24°</b></button>
+          <button class="pin" type="button" data-k="terrace" style="--x:52%;--y:41%" aria-controls="card-terrace" aria-expanded="false"><span class="pin__t">Веранда</span><b class="pin__deg num">−27°</b></button>
+          <button class="pin" type="button" data-k="banya" style="--x:25.5%;--y:58%" aria-controls="card-banya" aria-expanded="false"><span class="pin__t">Баня</span><b class="pin__deg num">+90°</b></button>
+          <button class="pin" type="button" data-k="chan" style="--x:9.5%;--y:75%" aria-controls="card-chan" aria-expanded="false"><span class="pin__t">Чан</span><b class="pin__deg num">+38°</b></button>
         </div>
       </div>
-      <p class="hero__hint"><span class="hint-fine">Проведите по&nbsp;стеклу, оно оттает</span><span class="hint-coarse">Листайте, стекло оттает</span></p>
-    </div>
-  </section>
-
-  <section id="uchastok" class="plot" data-stage="0">
-    <h2 class="visually-hidden">Участок: дом, баня и&nbsp;чан</h2>
-    <div class="scene3d" role="group" aria-label="Объёмный макет участка: дом с верандой, баня и чан среди сосен">
-      <img class="scene3d__poster" src="assets/img/scene-poster.webp?v=2" alt="" width="1430" height="900">
-      <canvas class="scene3d__canvas" aria-hidden="true"></canvas>
-      <button class="hotspot" type="button" data-go="1">Дом</button>
-      <button class="hotspot" type="button" data-go="2">Баня</button>
-      <button class="hotspot" type="button" data-go="3">Чан</button>
+      <div class="stand__veil" aria-hidden="true"></div>
     </div>
 
-    <div class="plot__text">
-      <article class="stage" data-i="0">
-        <p class="stage__temp">−27°&nbsp;·&nbsp;улица</p>
-        <h3>Весь участок на&nbsp;одну компанию</h3>
-        <p class="stage__text">Дом, отдельная баня и&nbsp;чан под&nbsp;открытым небом. Рядом сосны и&nbsp;небольшое озеро, соседей за&nbsp;забором нет. Посёлок Сингапай, территория КФХ&nbsp;«Рута».</p>
-        <p class="stage__hint">Листайте или нажмите на&nbsp;дом, баню или чан</p>
-      </article>
+    <header class="topbar">
+      <a class="topbar__logo" href="#dvor"><svg class="mark" viewBox="0 8 120 80" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 79 L60 18 L115 79" stroke-width="5"/><path d="M14 74 H106" stroke-width="5"/><path d="M51.5 62 L34 47 M68.5 62 L86 47" stroke-width="3.75"/><path d="M55.5 56 V31 a4.5 4.5 0 0 1 9 0 V56" stroke-width="3.2"/><circle cx="60" cy="62.5" r="8.6" stroke-width="3.2"/></g><rect x="58" y="36.8" width="4" height="25.2" rx="2" fill="#E0422F"/><circle cx="60" cy="62.5" r="5.2" fill="#E0422F"/></svg><span>Место гедониста</span></a>
+      <nav class="topbar__nav" aria-label="Основная">
+        <ul>
+          <li><a href="#dvor" data-open-map>Двор</a></li>
+          <li><a href="#dalshe">Дом</a></li>
+          <li><a href="#dalshe">Баня и&nbsp;чан</a></li>
+          <li><a href="#dalshe">Цены</a></li>
+          <li><a href="#dalshe">Дорога</a></li>
+        </ul>
+      </nav>
+      <p class="topbar__where">Сингапай, 10&nbsp;минут от&nbsp;Нефтеюганска</p>
+    </header>
 
-      <article class="stage" data-i="1">
-        <p class="stage__temp">+24°&nbsp;·&nbsp;дом</p>
-        <h3>Зал с&nbsp;фермами под&nbsp;крышей</h3>
-        <p class="stage__text">Панорамные окна, проектор, кухня с&nbsp;посудомойкой и&nbsp;две спальни. Дом вмещает до&nbsp;25&nbsp;гостей, ночевать остаются шестеро.</p>
-        <p class="stage__price">Сутки&nbsp;— <b class="num">15&nbsp;000&nbsp;₽</b> в&nbsp;будни, <b class="num">20&nbsp;000&nbsp;₽</b> с&nbsp;пятницы по&nbsp;воскресенье и&nbsp;в&nbsp;праздники</p>
-        <figure class="stage__fig">
-          <img src="assets/img/hall.webp?v=1" alt="" width="144" height="144" loading="lazy">
-          <figcaption>Зал. Фото летнее</figcaption>
-        </figure>
-      </article>
-
-      <article class="stage" data-i="2">
-        <p class="stage__temp">+90°&nbsp;·&nbsp;парная</p>
-        <h3>Баня стоит отдельно</h3>
-        <p class="stage__text">От&nbsp;дома к&nbsp;ней идёшь по&nbsp;снегу, обратно бежишь. Гости в&nbsp;отзывах называют её шикарной.</p>
-        <p class="stage__price"><b class="num">+4&nbsp;000&nbsp;₽</b> к&nbsp;аренде, в&nbsp;любой&nbsp;день</p>
-        <button class="toggle" type="button" data-item="banya" aria-pressed="false">Добавить баню</button>
-        <figure class="stage__fig">
-          <img src="assets/img/banya.webp?v=1" alt="" width="144" height="144" loading="lazy">
-          <figcaption>Баня. Фото летнее</figcaption>
-        </figure>
-      </article>
-
-      <article class="stage" data-i="3">
-        <p class="stage__temp">+38°&nbsp;·&nbsp;чан</p>
-        <h3>В&nbsp;чане сидят до&nbsp;ночи</h3>
-        <p class="stage__text">Чан стоит на&nbsp;настиле рядом с&nbsp;баней. Над головой небо и&nbsp;сосны, вокруг минус, в&nbsp;воде плюс.</p>
-        <p class="stage__price"><b class="num">+4&nbsp;000&nbsp;₽</b> к&nbsp;аренде, в&nbsp;любой&nbsp;день</p>
-        <button class="toggle" type="button" data-item="chan" aria-pressed="false">Добавить чан</button>
-        <figure class="stage__fig">
-          <img src="assets/img/chan.webp?v=1" alt="" width="144" height="144" loading="lazy">
-          <figcaption>Чан. Фото летнее</figcaption>
-        </figure>
-      </article>
+    <div class="hall">
+      <h1>Место гедониста</h1>
+      <p class="hall__lead">Зал с&nbsp;фермами под&nbsp;крышей, проектор и&nbsp;кухня. Баня и&nbsp;чан&nbsp;— во&nbsp;дворе. 10&nbsp;минут от&nbsp;Нефтеюганска, до&nbsp;25&nbsp;гостей.</p>
+      <button class="peek" type="button" aria-describedby="peek-note">
+        <span class="peek__win" aria-hidden="true">
+          <img src="assets/img/yard-peek.webp?v=1" alt="" width="560" height="296">
+          <canvas class="peek__snow"></canvas>
+          <span class="peek__pane peek__pane--l"></span>
+          <span class="peek__pane peek__pane--r"></span>
+        </span>
+        <span class="peek__text">
+          <span class="peek__go">Выйти во&nbsp;двор</span>
+          <span class="peek__sub"><b class="num">−27°</b> <span data-peek-sub>баня, чан, веранда</span></span>
+        </span>
+      </button>
+      <p id="peek-note" class="visually-hidden">Камера выйдет из&nbsp;зала через панорамную дверь и&nbsp;поднимется над участком. Дальше&nbsp;— карта двора.</p>
     </div>
 
-    <aside class="bill" aria-live="polite">
-      <p class="bill__title">Счёт</p>
-      <ul class="bill__rows">
-        <li><span>Дом, сутки в&nbsp;будни</span><i aria-hidden="true"></i><b class="num">15&nbsp;000&nbsp;₽</b></li>
-        <li data-row="banya" hidden><span>Баня</span><i aria-hidden="true"></i><b class="num">4&nbsp;000&nbsp;₽</b></li>
-        <li data-row="chan" hidden><span>Чан</span><i aria-hidden="true"></i><b class="num">4&nbsp;000&nbsp;₽</b></li>
-      </ul>
-      <p class="bill__total">Итого&nbsp;— <b class="num" data-total>15&nbsp;000&nbsp;₽</b></p>
-      <p class="bill__note">До&nbsp;15&nbsp;гостей. Выходные и&nbsp;почасовая аренда считаются в&nbsp;подборе.</p>
-    </aside>
+    <p class="strip"><span>4,6 на&nbsp;Яндекс Картах · 26&nbsp;оценок</span><span>Дом и&nbsp;двор&nbsp;— целиком одной компании</span></p>
 
-    <p class="plot__note">Температуры на&nbsp;шкале условные, для&nbsp;настроения. Макет упрощён, расстояния не&nbsp;в&nbsp;масштабе.</p>
+    <button class="skip" type="button" hidden>Пропустить пролёт</button>
+
+    <div class="map" hidden>
+      <div class="cards">
+        <article class="card" id="card-house" data-k="house" hidden aria-labelledby="card-house-h">
+          <figure class="card__fig"><img src="assets/img/hall.webp?v=1" alt="Зал дома днём: диван, кухня, фермы" width="144" height="144" loading="lazy"><figcaption>Зал. Фото летнее</figcaption></figure>
+          <p class="card__temp num">+24°&nbsp;· дом</p>
+          <h3 id="card-house-h" tabindex="-1">Зал с&nbsp;фермами под&nbsp;крышей</h3>
+          <p class="card__text">Панорамные окна, проектор, кухня с&nbsp;посудомойкой и&nbsp;две спальни. Дом вмещает до&nbsp;25&nbsp;гостей, ночевать остаются шестеро.</p>
+          <blockquote class="card__q"><p>«высокие потолки и&nbsp;домашний кинотеатр»</p><cite>Регина&nbsp;И., Яндекс Карты</cite></blockquote>
+          <fieldset class="days">
+            <legend>Сутки в&nbsp;доме</legend>
+            <label><input type="radio" name="days" value="wd" checked><span>Будни <b class="num">15&nbsp;000&nbsp;₽</b></span></label>
+            <label><input type="radio" name="days" value="we"><span>Пт–Вс и&nbsp;праздники <b class="num">20&nbsp;000&nbsp;₽</b></span></label>
+          </fieldset>
+        </article>
+
+        <article class="card" id="card-terrace" data-k="terrace" hidden aria-labelledby="card-terrace-h">
+          <figure class="card__fig"><img src="assets/img/terrace.webp?v=1" alt="Веранда летом: парус, стол со скамьями, шезлонги" width="144" height="144" loading="lazy"><figcaption>Веранда. Фото летнее</figcaption></figure>
+          <p class="card__temp num">−27°&nbsp;· веранда</p>
+          <h3 id="card-terrace-h" tabindex="-1">Веранда во&nbsp;всю длину дома</h3>
+          <p class="card__text">Терракотовый парус, флажки, стол со&nbsp;скамьями, шезлонги и&nbsp;перила из&nbsp;столбов и&nbsp;каната. Входит в&nbsp;аренду дома.</p>
+          <blockquote class="card__q"><p>«огромная веранда»</p><cite>Регина&nbsp;И., Яндекс Карты</cite></blockquote>
+        </article>
+
+        <article class="card" id="card-banya" data-k="banya" hidden aria-labelledby="card-banya-h">
+          <figure class="card__fig"><img src="assets/img/banya.webp?v=1" alt="Баня летом: тёмный сруб на настиле среди сосен" width="144" height="144" loading="lazy"><figcaption>Баня. Фото летнее</figcaption></figure>
+          <p class="card__temp num">+90°&nbsp;· парная</p>
+          <h3 id="card-banya-h" tabindex="-1">Баня стоит отдельно</h3>
+          <p class="card__text">От&nbsp;дома к&nbsp;ней идёшь по&nbsp;снегу, обратно бежишь.</p>
+          <blockquote class="card__q"><p>«баня шикарная»</p><cite>Кристина Фила, Яндекс Карты</cite></blockquote>
+          <p class="card__price"><b class="num">+4&nbsp;000&nbsp;₽</b> к&nbsp;аренде, в&nbsp;любой день</p>
+          <button class="toggle" type="button" data-item="banya" aria-pressed="false">Добавить баню</button>
+        </article>
+
+        <article class="card" id="card-chan" data-k="chan" hidden aria-labelledby="card-chan-h">
+          <figure class="card__fig"><img src="assets/img/chan.webp?v=1" alt="Чан летом на деревянном настиле" width="144" height="144" loading="lazy"><figcaption>Чан. Фото летнее</figcaption></figure>
+          <p class="card__temp num">+38°&nbsp;· чан</p>
+          <h3 id="card-chan-h" tabindex="-1">В&nbsp;чане сидят до&nbsp;ночи</h3>
+          <p class="card__text">Чан стоит на&nbsp;настиле рядом с&nbsp;баней. Над головой небо и&nbsp;сосны, вокруг минус, в&nbsp;воде плюс.</p>
+          <blockquote class="card__q"><p>«отдельно стоящая баня и&nbsp;чан»</p><cite>Владимир Бобрихин, Яндекс Карты</cite></blockquote>
+          <p class="card__price"><b class="num">+4&nbsp;000&nbsp;₽</b> к&nbsp;аренде, в&nbsp;любой день</p>
+          <button class="toggle" type="button" data-item="chan" aria-pressed="false">Добавить чан</button>
+        </article>
+        <button class="card__close" type="button" hidden aria-label="Закрыть карточку"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3 13 13M13 3 3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+      </div>
+
+      <button class="stub" type="button" aria-expanded="false" aria-controls="receipt">Итого <b class="num" data-total-stub>15&nbsp;000&nbsp;₽</b></button>
+      <div class="printer" id="receipt">
+        <div class="printer__slot" aria-hidden="true"></div>
+        <div class="printer__feed">
+          <div class="receipt" aria-live="polite">
+            <p class="receipt__c receipt__name">Место гедониста</p>
+            <p class="receipt__c receipt__small">п.&nbsp;Сингапай, тер.&nbsp;КФХ «Рута», 12/2</p>
+            <hr class="receipt__hr">
+            <p class="receipt__row"><span>Предварительный расчёт</span></p>
+            <p class="receipt__row receipt__small"><span data-now>—</span><span>Гостей: до&nbsp;15</span></p>
+            <hr class="receipt__hr">
+            <div class="receipt__rows">
+              <div class="receipt__line" data-row="house"><p>Дом, сутки, <span data-days-name>будни</span></p><p class="receipt__row receipt__qty"><span>1 × <span data-days-price>15 000</span></span><span data-days-sum>15 000</span></p></div>
+              <div class="receipt__line" data-row="banya" hidden><p>Баня</p><p class="receipt__row receipt__qty"><span>1 × 4 000</span><span>4 000</span></p></div>
+              <div class="receipt__line" data-row="chan" hidden><p>Чан</p><p class="receipt__row receipt__qty"><span>1 × 4 000</span><span>4 000</span></p></div>
+            </div>
+            <hr class="receipt__hr receipt__hr--double">
+            <p class="receipt__row receipt__total"><span>Итого</span><span data-total>15 000 ₽</span></p>
+            <div class="receipt__qr">
+              <img src="assets/img/qr-chat.svg?v=1" alt="QR-код чата" width="74" height="74" loading="lazy">
+              <p class="receipt__small">Отсканируйте, чтобы написать в&nbsp;чат. <a href="https://max.ru/u/f9LHodD0cOLaY0QWOI_nVbSbi6RzxVHj2z8PKyE7IdGz8zfiN4PkCBS8Sq8" target="_blank" rel="noopener">Или откройте&nbsp;его</a></p>
+            </div>
+            <p class="receipt__c receipt__small">Не&nbsp;является фискальным документом</p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="chips" aria-label="Постройки">
+        <button type="button" data-k="house">Дом</button><button type="button" data-k="terrace">Веранда</button><button type="button" data-k="banya">Баня</button><button type="button" data-k="chan">Чан</button>
+      </nav>
+
+      <button class="back" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 5 3.5 9.5 8 14M4 9.5h7.5a5 5 0 0 1 0 10H10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Обратно в&nbsp;зал</button>
+      <p class="map__note">Это кадр из&nbsp;3D-модели участка, построенной по&nbsp;фото. Расстояния и&nbsp;деревья приблизительные.</p>
+    </div>
   </section>
 
   <section id="dalshe" class="next">
     <h2>Дальше по&nbsp;шкале</h2>
-    <p>Здесь появятся дом внутри, баня и&nbsp;чан крупным планом, подбор отдыха со&nbsp;счётом, отзывы гостей с&nbsp;Яндекс&nbsp;Карт и&nbsp;дорога. Сейчас готовы первый экран и&nbsp;макет участка.</p>
+    <p>Здесь появятся дом внутри, баня и&nbsp;чан крупным планом, подбор отдыха со&nbsp;счётом, отзывы гостей с&nbsp;Яндекс&nbsp;Карт и&nbsp;дорога. Сейчас готовы первый экран, пролёт во&nbsp;двор и&nbsp;карта участка.</p>
     <a class="btn" href="https://max.ru/u/f9LHodD0cOLaY0QWOI_nVbSbi6RzxVHj2z8PKyE7IdGz8zfiN4PkCBS8Sq8" target="_blank" rel="noopener">Написать автору демо</a>
-    <p class="plot__note plot__note--next">Температуры на&nbsp;шкале условные, для&nbsp;настроения. Макет упрощён, расстояния не&nbsp;в&nbsp;масштабе.</p>
+    <p class="next__note">Температуры на&nbsp;шкале условные, для&nbsp;настроения.</p>
   </section>
 </main>
 

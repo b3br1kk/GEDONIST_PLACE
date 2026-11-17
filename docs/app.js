@@ -1,17 +1,24 @@
 (() => {
   'use strict';
   const root = document.documentElement;
-  if (!window.gsap || !window.ScrollTrigger) { root.classList.remove('is-loading'); return; }
   root.classList.remove('no-js');
-  gsap.registerPlugin(ScrollTrigger);
-
+  const G = window.gsap;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const t = s => (reduce ? 0 : s);
+  const fine = matchMedia('(pointer: fine)').matches;
   const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const small = () => innerWidth < 900;
-  const hero = $('#hero'), plot = $('#uchastok');
-  const rail = c => root.style.setProperty('--rail-ink', c);
-  if (reduce) root.classList.remove('is-loading');
+  const clamp01 = v => Math.min(1, Math.max(0, v));
+  const smooth = v => v * v * (3 - 2 * v);
+
+  const stand = $('#dvor'), frame = $('.stand__frame', stand), media = $('.stand__media', stand);
+  const video = $('.stand__video', stand), veil = $('.stand__veil', stand);
+  const hall = $('.hall', stand), topbar = $('.topbar', stand), strip = $('.strip', stand);
+  const peek = $('.peek', stand), peekSub = $('[data-peek-sub]', stand), skipBtn = $('.skip', stand);
+  const map = $('.map', stand), mapHead = $('.map__head', stand), mapH2 = $('h2', mapHead);
+  const glows = $('.glows', stand), printer = $('.printer', map), stub = $('.stub', map);
+  const closeBtn = $('.card__close', map), backBtn = $('.back', map);
+  video.muted = true;
 
   /* ---------- Шкала ---------- */
   const thermo = $('.thermo'), numEl = $('.thermo__num'), labelEl = $('.thermo__label');
@@ -21,241 +28,385 @@
     if (i % 5 === 0) tick.className = 'is-long';
     $('.thermo__scale').append(tick);
   }
-  const th = { v: -27 };
+  const th = { v: 24 };
   const renderT = () => {
     const v = Math.round(th.v);
     numEl.textContent = (v < 0 ? '−' : v > 0 ? '+' : '') + Math.abs(v) + '°';
-    thermo.style.setProperty('--f', Math.min(1, Math.max(0, (th.v + 30) / 130)).toFixed(4));
+    thermo.style.setProperty('--f', clamp01((th.v + 30) / 130).toFixed(4));
   };
-  window.setTemp = (value, label) => {
+  const rail = c => root.style.setProperty('--rail-ink', c);
+  function setTemp(v, label, dur = 0.6) {
     labelEl.textContent = label;
-    gsap.to(th, { v: value, duration: t(0.6), ease: 'power2.out', overwrite: true, onUpdate: renderT });
-  };
+    if (G && !reduce && dur) G.to(th, { v, duration: dur, ease: 'power2.out', overwrite: true, onUpdate: renderT });
+    else { if (G) G.killTweensOf(th); th.v = v; renderT(); }
+  }
+  rail('var(--ink)');
   renderT();
 
-  /* ---------- Иней ---------- */
-  const frostEl = $('.frost'), ctx = frostEl.getContext('2d');
-  const mk = () => document.createElement('canvas');
-  const fs = { open: 0, k: 0 };
-  let W = 0, H = 0, sc = 1, tex = null, trail = null, tctx = null, frame = 0;
+  /* ---------- Открытие ---------- */
+  root.classList.remove('is-loading');
+  if (G && !reduce) {
+    G.from([topbar, ...hall.children, strip], { autoAlpha: 0, y: 14, duration: 0.8, ease: 'power3.out', stagger: 0.07, delay: 0.1, clearProps: 'transform' });
+  }
 
-  const rStart = () => Math.min(innerWidth, innerHeight) * (small() ? 0.30 : 0.24);
-  const rEnd = () => Math.hypot(hero.clientWidth, hero.clientHeight) * 0.8;
-  const radius = () => ((1 - fs.k) * fs.open * rStart() + fs.k * rEnd()) * sc;
-
-  function fern(g) {
+  /* ---------- Иней на створках окна ---------- */
+  function fern(g, W, H, s) {
     const e = Math.random() * 4 | 0, u = Math.random();
-    let x = e < 2 ? u * W : (e === 2 ? 0 : W);
-    let y = e < 2 ? (e === 0 ? 0 : H) : u * H;
+    let x = e < 2 ? u * W : (e === 2 ? 0 : W), y = e < 2 ? (e === 0 ? 0 : H) : u * H;
     let a = Math.atan2(H / 2 - y, W / 2 - x) + (Math.random() - 0.5);
-    const n = 6 + (Math.random() * 5 | 0), branches = new Set();
-    while (branches.size < 2 + (Math.random() * 3 | 0)) branches.add(1 + (Math.random() * (n - 1) | 0));
-    g.beginPath();
-    g.moveTo(x, y);
+    g.beginPath(); g.moveTo(x, y);
+    const n = 4 + (Math.random() * 4 | 0);
     for (let i = 1; i <= n; i++) {
-      a += (Math.random() - 0.5) * 0.5;
-      const l = (14 + Math.random() * 20) * sc;
+      a += (Math.random() - 0.5) * 0.6;
+      const l = (5 + Math.random() * 8) * s;
       x += Math.cos(a) * l; y += Math.sin(a) * l;
       g.lineTo(x, y);
-      if (branches.has(i)) {
-        const ba = a + (Math.random() < 0.5 ? -1 : 1) * (0.6 + Math.random() * 0.5), bl = (8 + Math.random() * 10) * sc;
-        g.lineTo(x + Math.cos(ba) * bl, y + Math.sin(ba) * bl);
-        g.moveTo(x, y);
+      if (Math.random() < 0.45) {
+        const ba = a + (Math.random() < 0.5 ? -1 : 1) * (0.6 + Math.random() * 0.5), bl = (3 + Math.random() * 5) * s;
+        g.lineTo(x + Math.cos(ba) * bl, y + Math.sin(ba) * bl); g.moveTo(x, y);
       }
     }
     g.stroke();
   }
-
-  function frostTexture() {
-    const c = mk(); c.width = W; c.height = H;
-    const g = c.getContext('2d'), mobile = small();
-    const grad = g.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, 'rgba(198,214,228,.97)');
-    grad.addColorStop(1, 'rgba(138,165,191,.97)');
-    g.fillStyle = grad; g.fillRect(0, 0, W, H);
+  function frostURL(w, h) {
+    const s = Math.min(2, devicePixelRatio || 1), W = Math.max(8, Math.round(w * s)), H = Math.max(8, Math.round(h * s));
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const g = c.getContext('2d');
+    const gr = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.1, W / 2, H / 2, Math.hypot(W, H) / 2);
+    gr.addColorStop(0, 'rgba(226,236,244,.18)'); gr.addColorStop(1, 'rgba(236,243,248,.78)');
+    g.fillStyle = gr; g.fillRect(0, 0, W, H);
     g.fillStyle = '#fff';
-    for (let i = 0; i < (mobile ? 600 : 1400); i++) {
-      g.globalAlpha = 0.08 + Math.random() * 0.27;
-      g.beginPath(); g.arc(Math.random() * W, Math.random() * H, (0.5 + Math.random() * 1.7) * sc, 0, 6.2832); g.fill();
+    for (let i = 0; i < W * H / 170; i++) { g.globalAlpha = 0.08 + Math.random() * 0.3; g.beginPath(); g.arc(Math.random() * W, Math.random() * H, (0.4 + Math.random()) * s, 0, 6.2832); g.fill(); }
+    g.globalAlpha = 1; g.strokeStyle = 'rgba(255,255,255,.34)'; g.lineWidth = 0.7 * s; g.lineCap = 'round';
+    for (let i = 0; i < 12; i++) fern(g, W, H, s);
+    return c.toDataURL('image/png');
+  }
+  const paneFrost = () => $$('.peek__pane', peek).forEach(p => { if (p.clientWidth) p.style.backgroundImage = `url(${frostURL(p.clientWidth, p.clientHeight)})`; });
+  paneFrost();
+
+  /* ---------- Снег за окном ---------- */
+  const snowC = $('.peek__snow', peek), sg = snowC.getContext('2d');
+  let flakes = [], snowRaf = 0, snowOn = false;
+  function snowSize() {
+    const s = Math.min(2, devicePixelRatio || 1);
+    snowC.width = Math.round(snowC.clientWidth * s); snowC.height = Math.round(snowC.clientHeight * s);
+    flakes = Array.from({ length: 34 }, () => ({ x: Math.random(), y: Math.random(), r: 0.5 + Math.random() * 1.1, v: 0.04 + Math.random() * 0.07, d: Math.random() * 6.28 }));
+  }
+  function snowTick(t) {
+    snowRaf = 0;
+    const W = snowC.width, H = snowC.height, s = W / Math.max(1, snowC.clientWidth);
+    sg.clearRect(0, 0, W, H); sg.fillStyle = 'rgba(240,246,250,.85)';
+    for (const f of flakes) {
+      f.y += f.v / 60; if (f.y > 1.05) { f.y = -0.05; f.x = Math.random(); }
+      const x = (f.x + Math.sin(t / 1400 + f.d) * 0.015) * W;
+      sg.beginPath(); sg.arc(x, f.y * H, f.r * s, 0, 6.2832); sg.fill();
     }
-    g.globalAlpha = 1; g.strokeStyle = 'rgba(255,255,255,.38)'; g.lineWidth = sc; g.lineCap = 'round';
-    for (let i = 0; i < (mobile ? 40 : 90); i++) fern(g);
-    const v = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.3, W / 2, H / 2, Math.hypot(W, H) / 2);
-    v.addColorStop(0, 'rgba(62,92,128,0)'); v.addColorStop(1, 'rgba(62,92,128,.42)');
-    g.fillStyle = v; g.fillRect(0, 0, W, H);
-    return c;
+    if (snowOn) snowRaf = requestAnimationFrame(snowTick);
   }
-
-  function blob(g, x, y, r, a) {
-    const gr = g.createRadialGradient(x, y, 0, x, y, r);
-    gr.addColorStop(0, `rgba(0,0,0,${a})`); gr.addColorStop(1, 'rgba(0,0,0,0)');
-    g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2);
-  }
-
-  function draw() {
-    if (!tex || !W || !H) return;
-    const time = reduce ? 0 : performance.now() / 1000;
-    ctx.clearRect(0, 0, W, H);
-    ctx.drawImage(tex, 0, 0);
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.drawImage(trail, 0, 0);
-    const R = radius();
-    if (R > 1) {
-      const cx = W * (small() ? 0.5 : 0.62), cy = H * (small() ? 0.36 : 0.44);
-      for (let i = 0; i < 10; i++) {
-        const ang = (i - 1) / 9 * 6.2832, off = i ? 0.42 * R : 0;
-        blob(ctx, cx + Math.cos(ang) * off, cy + Math.sin(ang) * off, R * (0.62 + 0.08 * Math.sin(time * 0.7 + i * 1.3)), 1);
-      }
-    }
-    ctx.globalCompositeOperation = 'source-over';
-    // «замерзание» следа: 0.012 каждый кадр, собрано в 0.048 раз в 4 кадра — иначе 8-битная альфа залипает на ~16%
-    if (!reduce && (++frame & 3) === 0) {
-      tctx.globalCompositeOperation = 'destination-out';
-      tctx.fillStyle = 'rgba(0,0,0,.048)';
-      tctx.fillRect(0, 0, W, H);
-      tctx.globalCompositeOperation = 'source-over';
-    }
-  }
-
-  function build() {
-    sc = Math.min(devicePixelRatio || 1, 1.5);
-    const nw = Math.round(hero.clientWidth * sc), nh = Math.round(hero.clientHeight * sc);
-    if (tex && nw === W && nh === H) return;
-    // вкладка в фоне или ещё не разложена: размеры 0 — ждём resize, иначе drawImage падает и останавливает весь скрипт
-    if (!nw || !nh) { tex = null; return; }
-    W = frostEl.width = nw; H = frostEl.height = nh;
-    tex = frostTexture();
-    trail = mk(); trail.width = W; trail.height = H; tctx = trail.getContext('2d');
-    draw();
-  }
-  build();
-
-  if (matchMedia('(pointer: fine)').matches && !reduce) {
-    let lx = null, ly = 0;
-    hero.addEventListener('pointermove', e => {
-      const r = hero.getBoundingClientRect();
-      const x = (e.clientX - r.left) * W / r.width, y = (e.clientY - r.top) * H / r.height;
-      const n = lx === null ? 1 : Math.ceil(Math.hypot(x - lx, y - ly) / (24 * sc));
-      for (let i = 1; i <= n; i++) blob(tctx, lx === null ? x : lx + (x - lx) * i / n, lx === null ? y : ly + (y - ly) * i / n, 74 * sc, 0.55);
-      lx = x; ly = y;
-    });
-    hero.addEventListener('pointerleave', () => { lx = null; });
-  }
-
-  let raf = 0, inView = true;
-  const tick = () => { raf = 0; draw(); sync(); };
-  const sync = () => {
-    const on = inView && !document.hidden && !reduce;
-    if (on && !raf) raf = requestAnimationFrame(tick);
-    else if (!on && raf) { cancelAnimationFrame(raf); raf = 0; }
+  const snowSync = (vis = snowVisible) => {
+    snowVisible = vis;
+    const on = vis && !document.hidden && !reduce && stand.dataset.state === 'hall';
+    if (on === snowOn) return;
+    snowOn = on;
+    if (on && !snowRaf) snowRaf = requestAnimationFrame(snowTick);
   };
-  new IntersectionObserver(([e]) => { inView = e.isIntersecting; sync(); }).observe(hero);
-  document.addEventListener('visibilitychange', sync);
-  sync();
+  let snowVisible = true;
+  snowSize();
+  if (reduce) snowTick(0);
+  new IntersectionObserver(([e]) => snowSync(e.isIntersecting)).observe(snowC);
+  document.addEventListener('visibilitychange', () => snowSync());
 
-  let rt;
-  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { build(); if (reduce) draw(); }, 150); });
-  // размер Hero может появиться без события resize (вкладка была скрыта)
-  if ('ResizeObserver' in window) new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(() => { build(); if (reduce) draw(); }, 150); }).observe(hero);
-
-  /* ---------- Открытие ---------- */
-  const h1 = $('h1', hero), lines = gsap.utils.toArray('.line__in', h1);
-  const late = [$('.topbar', hero), $('.hero__lead'), $('.hero__row'), $('.hero__hint')];
-
-  function intro() {
-    const r = h1.getBoundingClientRect();
-    gsap.set(h1, { autoAlpha: 1, x: innerWidth / 2 - (r.left + r.width / 2), y: innerHeight / 2 - (r.top + r.height / 2), scale: 1 });
-    gsap.set(lines, { yPercent: 110 });
-    gsap.set(late, { autoAlpha: 0, y: 14 });
-    gsap.timeline()
-      .to(lines, { yPercent: 0, duration: 0.9, ease: 'power4.out', stagger: 0.08 }, 0)
-      .to(h1, { x: 0, y: 0, duration: 1, ease: 'power3.inOut' }, 1.05)
-      .to(fs, { open: 1, duration: 1.3, ease: 'power2.out' }, 1.05)
-      .call(() => root.classList.remove('is-loading'), null, 2.05)
-      .to(late, { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power3.out', stagger: 0.08 }, 1.95);
+  /* ---------- Видео пролёта ---------- */
+  const DUR = 370 / 60;
+  const srcFor = () => (!small() && Math.min(2, devicePixelRatio || 1) * frame.clientWidth > 1100 ? 'assets/video/fly-1600.mp4?v=1' : 'assets/video/fly-960.mp4?v=1');
+  function loadVideo() {
+    if (video.getAttribute('src')) return;
+    video.src = srcFor(); video.preload = 'auto'; video.load();
   }
-  if (reduce) { fs.open = 1; draw(); }
-  else Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1200))]).then(intro);
-
-  if (!reduce) gsap.to('.arrow', { y: 4, duration: 1.6, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-
-  /* ---------- Прокрутка Hero ---------- */
-  const hp = { p: 0 };
-  gsap.timeline({
-    defaults: { ease: 'none' },
-    scrollTrigger: { trigger: hero, start: 'top top', end: '+=70%', pin: true, scrub: 0.6, onEnterBack: () => rail('var(--night)') }
-  })
-    .to(hp, { p: 1, duration: 1, onUpdate: () => { const u = Math.max(0, (hp.p - 0.25) / 0.75); fs.k = u * u; if (reduce) draw(); } }, 0)
-    .to('.hero__fade', { autoAlpha: 0, y: -24, duration: 0.4 }, 0.6);
-
-  /* ---------- Стадии сцены ---------- */
-  const stages = gsap.utils.toArray('.stage');
-  const temps = [[-27, 'улица'], [24, 'дом'], [90, 'парная'], [38, 'чан']];
-  const stageOf = p => (p < 0.30 ? 0 : p < 0.55 ? 1 : p < 0.80 ? 2 : 3);
-  let cur = 0;
-  gsap.set(stages, { autoAlpha: 0 });
-  gsap.set(stages[0], { autoAlpha: 1 });
-
-  function goStage(i) {
-    const out = stages[cur], inn = stages[i];
-    cur = i;
-    plot.dataset.stage = i;
-    gsap.killTweensOf([out, inn]);
-    gsap.to(out, { autoAlpha: 0, y: -10, duration: t(0.45), ease: 'power3.out' });
-    gsap.fromTo(inn, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: t(0.45), ease: 'power3.out' });
-    setTemp(...temps[i]);
-  }
-
-  const pp = { p: 0 };
-  gsap.to(pp, {
-    p: 1, ease: 'none',
-    scrollTrigger: {
-      id: 'plot', trigger: plot, start: 'top top', end: '+=400%', pin: true, scrub: 0.8,
-      onEnter: () => rail('var(--ink-night)'), onEnterBack: () => rail('var(--ink-night)')
-    },
-    onUpdate: () => {
-      const s = stageOf(pp.p);
-      if (s !== cur) goStage(s);
-      window.dispatchEvent(new CustomEvent('plot:progress', { detail: { p: pp.p } }));
-    }
-  });
-
-  ScrollTrigger.create({
-    trigger: '#dalshe', start: 'top 50%', end: 'bottom top',
-    onEnter: () => rail('var(--ink)'), onEnterBack: () => rail('var(--ink)'), onLeaveBack: () => rail('var(--ink-night)')
-  });
-
-  document.querySelectorAll('.hotspot').forEach(b => b.addEventListener('click', () => {
-    const st = ScrollTrigger.getById('plot'), k = [0.42, 0.67, 0.92][b.dataset.go - 1];
-    window.scrollTo({ top: st.start + (st.end - st.start) * k, behavior: reduce ? 'auto' : 'smooth' });
-  }));
-
-  /* ---------- Счёт ---------- */
-  const items = { banya: false, chan: false };
-  const names = { banya: ['Добавить баню', 'Баня в счёте'], chan: ['Добавить чан', 'Чан в счёте'] };
-  const total = $('[data-total]');
-  const money = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₽';
-
-  document.querySelectorAll('.toggle').forEach(btn => btn.addEventListener('click', () => {
-    const k = btn.dataset.item, on = (items[k] = !items[k]), row = $(`[data-row="${k}"]`);
-    btn.setAttribute('aria-pressed', on);
-    btn.textContent = names[k][+on];
-    if (on) {
-      row.hidden = false;
-      gsap.fromTo(row, { height: 0, autoAlpha: 0 }, { height: 'auto', autoAlpha: 1, duration: t(0.35), ease: 'power3.out', overwrite: true, clearProps: 'height' });
-    } else {
-      gsap.to(row, { height: 0, autoAlpha: 0, duration: t(0.35), ease: 'power3.out', overwrite: true, onComplete: () => { row.hidden = true; } });
-    }
-    total.textContent = money(15000 + 4000 * (items.banya + items.chan));
-  }));
-
-  /* ---------- Загрузка 3D ---------- */
-  if (!reduce && !navigator.connection?.saveData) {
-    const loaded = document.readyState === 'complete' ? Promise.resolve() : new Promise(r => addEventListener('load', r, { once: true }));
-    const near = new Promise(r => {
-      const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); r(); } }, { rootMargin: '150% 0px' });
-      io.observe(plot);
+  function waitReady(ms) {
+    return new Promise(res => {
+      if (video.readyState >= 4) return res(true);
+      let done = false;
+      const fin = ok => { if (done) return; done = true; clearTimeout(tm); video.removeEventListener('canplaythrough', yes); video.removeEventListener('error', no); res(ok); };
+      const yes = () => fin(true), no = () => fin(false);
+      const tm = setTimeout(() => fin(video.readyState >= 2), ms);
+      video.addEventListener('canplaythrough', yes); video.addEventListener('error', no);
     });
-    Promise.all([loaded, near]).then(() => import('./scene.js?v=2')).catch(() => {});
   }
+  // видео тянем заранее, когда страница уже показалась, или как только к кнопке потянулись
+  if (!navigator.connection?.saveData) {
+    const later = () => setTimeout(loadVideo, 900);
+    if (document.readyState === 'complete') later(); else addEventListener('load', later, { once: true });
+  }
+  ['pointerenter', 'focus', 'touchstart'].forEach(ev => peek.addEventListener(ev, loadVideo, { once: true, passive: true }));
+
+  /* ---------- Состояния: зал → пролёт → двор ---------- */
+  let busy = false, syncId = 0;
+  const setState = s => { stand.dataset.state = s; snowSync(); };
+  const fieldPx = () => [topbar.offsetHeight, small() ? Math.round(stand.clientHeight * 0.44) : topbar.offsetHeight];
+
+  function flightSync() {
+    const t = video.currentTime;
+    const k = smooth(clamp01((t - 1.2) / 1.5));
+    th.v = 24 + (-27 - 24) * k; renderT();
+    labelEl.textContent = k < 0.5 ? 'зал' : 'улица';
+    rail(t < 2.1 ? 'var(--ink)' : 'var(--ink-night)');
+    if (stand.dataset.state === 'fly') syncId = video.requestVideoFrameCallback ? video.requestVideoFrameCallback(flightSync) : requestAnimationFrame(flightSync);
+  }
+
+  async function goYard() {
+    if (stand.dataset.state !== 'hall' || busy) return;
+    busy = true;
+    if (reduce || !G) return showMapInstant();
+    loadVideo();
+    if (video.readyState < 4) { peek.setAttribute('aria-busy', 'true'); peekSub.textContent = 'открываем дверь…'; }
+    const ok = await waitReady(8000);
+    peek.removeAttribute('aria-busy'); peekSub.textContent = 'баня, чан, веранда';
+    if (!ok) return showMapInstant();
+    video.currentTime = 0;
+    try { await video.play(); } catch (e) { return showMapInstant(); }
+    stand.classList.add('is-vid');
+    setState('fly');
+    const [ct, cb] = fieldPx();
+    stand.style.setProperty('--ct', ct + 'px'); stand.style.setProperty('--cb', cb + 'px');
+    G.timeline()
+      .to([hall, strip], { autoAlpha: 0, y: -14, duration: 0.45, ease: 'power3.out' }, 0)
+      .to(topbar, { autoAlpha: 0, duration: 0.35, ease: 'power2.out' }, 0.1)
+      .to(stand, { '--ct': '0px', '--cb': '0px', duration: 1.2, ease: 'power3.inOut' }, 0.15);
+    skipBtn.hidden = false;
+    G.fromTo(skipBtn, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4, delay: 0.7 });
+    flightSync();
+    video.addEventListener('ended', enterMap, { once: true });
+  }
+
+  function skip() {
+    if (stand.dataset.state !== 'fly') return;
+    video.removeEventListener('ended', enterMap);
+    video.pause();
+    video.addEventListener('seeked', enterMap, { once: true });
+    video.currentTime = Math.max(0, (video.duration || DUR) - 0.02);
+  }
+
+  function showMapInstant() {
+    stand.classList.remove('is-vid');
+    if (G) G.set([hall, strip], { autoAlpha: 0 }); else { hall.style.visibility = 'hidden'; strip.style.visibility = 'hidden'; }
+    enterMap();
+  }
+
+  function enterMap() {
+    if (stand.dataset.state === 'map') return;
+    skipBtn.hidden = true;
+    stand.style.setProperty('--ct', '0px'); stand.style.setProperty('--cb', '0px');
+    setState('map');
+    setTemp(-27, 'улица', 0.3);
+    rail('var(--ink-night)');
+    map.hidden = false;
+    if (small()) enablePan();
+    if (G) {
+      G.killTweensOf([hall, strip]);
+      G.set([hall, strip], { autoAlpha: 0 });
+      G.to(topbar, { autoAlpha: 1, duration: 0.5 });
+      const m = reduce ? 0 : 1;
+      // from() с clearProps: после входа видимость снова решает CSS (карточка прячет заголовок и кнопки)
+      G.from([mapHead, backBtn, $('.chips', map), stub], { autoAlpha: 0, y: 10 * m, duration: 0.6 * m, ease: 'power3.out', stagger: 0.06 * m, clearProps: 'opacity,visibility,transform' });
+      G.from($$('.pin', stand), { autoAlpha: 0, y: 8 * m, duration: 0.5 * m, ease: 'power3.out', stagger: 0.09 * m, delay: 0.15 * m, clearProps: 'opacity,visibility,transform' });
+      if (!small()) G.from(printer, { autoAlpha: 0, y: 24 * m, duration: 0.7 * m, ease: 'power3.out', delay: 0.3 * m, clearProps: 'opacity,visibility,transform' });
+    }
+    mapH2.focus({ preventScroll: true });
+    busy = false;
+  }
+
+  function backToHall() {
+    if (stand.dataset.state !== 'map' || busy) return;
+    busy = true;
+    closeCard(false);
+    const swap = () => {
+      map.hidden = true;
+      disablePan();
+      video.pause();
+      if (video.readyState >= 1) video.currentTime = 0;
+      stand.classList.remove('is-vid');
+      setState('hall');
+      stand.style.removeProperty('--ct'); stand.style.removeProperty('--cb');
+      setTemp(24, 'зал', 0);
+      rail('var(--ink)');
+      printer.classList.remove('is-open'); stub.setAttribute('aria-expanded', 'false');
+      if (G) G.set([hall, strip, topbar], { autoAlpha: 1, y: 0 });
+      else { hall.style.visibility = ''; strip.style.visibility = ''; }
+      peek.focus({ preventScroll: true });
+    };
+    if (!G || reduce) { swap(); busy = false; return; }
+    G.timeline({ onComplete: () => { busy = false; } })
+      .to(veil, { opacity: 1, duration: 0.3, ease: 'power2.in' })
+      .add(swap)
+      .to(veil, { opacity: 0, duration: 0.5, ease: 'power2.out' }, '+=0.05');
+  }
+
+  peek.addEventListener('click', goYard);
+  skipBtn.addEventListener('click', skip);
+  backBtn.addEventListener('click', backToHall);
+  $$('[data-open-map]').forEach(a => a.addEventListener('click', e => {
+    e.preventDefault();
+    stand.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    goYard();
+  }));
+
+  /* ---------- Сдвиг двора пальцем (телефон) ---------- */
+  function enablePan() {
+    if (stand.classList.contains('is-pan')) return;
+    media.style.transition = 'none';
+    stand.classList.add('is-pan');
+    frame.scrollLeft = (media.offsetWidth - frame.clientWidth) / 2;
+    void media.offsetWidth;
+    media.style.transition = '';
+  }
+  function disablePan() {
+    stand.classList.remove('is-pan');
+    frame.scrollLeft = 0;
+  }
+  let rt;
+  addEventListener('resize', () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => {
+      paneFrost(); snowSize();
+      if (stand.dataset.state === 'map') { if (small()) enablePan(); else disablePan(); }
+    }, 150);
+  });
+
+  /* ---------- Двор: наведение по маскам, карточки ---------- */
+  const KEYS = ['house', 'terrace', 'banya', 'chan'];
+  const TEMPS = { house: [24, 'дом'], terrace: [-27, 'веранда'], banya: [90, 'парная'], chan: [38, 'чан'] };
+  // центры построек в кадре (по маскам из Blender)
+  const POS = { house: [0.75, 0.28], terrace: [0.58, 0.39], banya: [0.284, 0.695], chan: [0.107, 0.8] };
+  let hit = null, hot = null, cur = null;
+  const hitImg = new Image();
+  hitImg.onload = () => {
+    const c = document.createElement('canvas'); c.width = hitImg.width; c.height = hitImg.height;
+    const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(hitImg, 0, 0);
+    hit = { w: c.width, h: c.height, d: g.getImageData(0, 0, c.width, c.height).data };
+  };
+  hitImg.src = 'assets/map/hit.png?v=1';
+  function keyAt(x, y) {
+    if (!hit) return null;
+    const r = media.getBoundingClientRect(), u = (x - r.left) / r.width, v = (y - r.top) / r.height;
+    if (u < 0 || u >= 1 || v < 0 || v >= 1) return null;
+    const i = hit.d[((v * hit.h | 0) * hit.w + (u * hit.w | 0)) * 4];
+    return KEYS[Math.round(i / 60) - 1] || null;
+  }
+  const byK = (sel, k) => $(`${sel}[data-k="${k}"]`, stand);
+  function setHot(k) {
+    if (k === hot) return;
+    if (hot) { byK('.glow', hot).classList.remove('is-hot'); byK('.pin', hot).classList.remove('is-hot'); }
+    hot = k;
+    if (k) { byK('.glow', k).classList.add('is-hot'); byK('.pin', k).classList.add('is-hot'); }
+    media.classList.toggle('is-over', !!k);
+  }
+  function select(k, focus = true) {
+    if (stand.dataset.state !== 'map') return;
+    if (cur === k) return closeCard();
+    const prev = cur;
+    cur = k;
+    KEYS.forEach(n => {
+      const on = n === k;
+      byK('.glow', n).classList.toggle('is-on', on);
+      byK('.pin', n).setAttribute('aria-expanded', on);
+      const chip = $(`.chips [data-k="${n}"]`, map); if (chip) chip.setAttribute('aria-pressed', on);
+      $(`#card-${n}`).hidden = !on;
+    });
+    glows.classList.add('has-on');
+    map.classList.add('has-card'); stand.classList.add('has-card');
+    closeBtn.hidden = false;
+    setTemp(...TEMPS[k]);
+    const card = $(`#card-${k}`);
+    card.scrollTop = 0;
+    if (G && !reduce) G.fromTo(card, { autoAlpha: 0, y: prev ? 6 : 14 }, { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power3.out', clearProps: 'transform' });
+    if (focus) $('h3', card).focus({ preventScroll: true });
+    if (stand.classList.contains('is-pan')) {
+      frame.scrollTo({ left: POS[k][0] * media.offsetWidth - frame.clientWidth / 2, behavior: reduce ? 'auto' : 'smooth' });
+      // постройку поднимаем в свободную полосу над шторкой; открывшийся низ прячется под ней
+      const H = frame.clientHeight, top = topbar.offsetHeight, sheet = card.getBoundingClientRect().top - frame.getBoundingClientRect().top;
+      const lift = Math.max(0, Math.min(POS[k][1] * H - (top + sheet) / 2, H - sheet - 4));
+      stand.style.setProperty('--lift', Math.round(lift) + 'px');
+    }
+  }
+  function closeCard(refocus = true) {
+    if (!cur) return;
+    const k = cur;
+    cur = null;
+    KEYS.forEach(n => {
+      byK('.glow', n).classList.remove('is-on');
+      byK('.pin', n).setAttribute('aria-expanded', 'false');
+      const chip = $(`.chips [data-k="${n}"]`, map); if (chip) chip.setAttribute('aria-pressed', 'false');
+      $(`#card-${n}`).hidden = true;
+    });
+    glows.classList.remove('has-on');
+    map.classList.remove('has-card'); stand.classList.remove('has-card');
+    stand.style.removeProperty('--lift');
+    closeBtn.hidden = true;
+    if (stand.dataset.state === 'map') setTemp(-27, 'улица');
+    if (refocus) byK('.pin', k).focus({ preventScroll: true });
+  }
+
+  if (fine) {
+    media.addEventListener('pointermove', e => { if (stand.dataset.state === 'map') setHot(e.target.closest('.pin')?.dataset.k || keyAt(e.clientX, e.clientY)); });
+    media.addEventListener('pointerleave', () => setHot(null));
+  }
+  media.addEventListener('click', e => {
+    if (stand.dataset.state !== 'map') return;
+    const pin = e.target.closest('.pin');
+    const k = pin ? pin.dataset.k : keyAt(e.clientX, e.clientY);
+    if (k) select(k, !!pin || e.detail === 0); else closeCard(false);
+  });
+  $$('.pin', stand).forEach(p => {
+    p.addEventListener('focus', () => setHot(p.dataset.k));
+    p.addEventListener('blur', () => setHot(null));
+  });
+  $$('.chips button', map).forEach(b => b.addEventListener('click', () => select(b.dataset.k)));
+  closeBtn.addEventListener('click', () => closeCard());
+  addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if (stand.dataset.state === 'fly') skip();
+    else if (cur) closeCard();
+    else if (printer.classList.contains('is-open')) { printer.classList.remove('is-open'); stub.setAttribute('aria-expanded', 'false'); stub.focus(); }
+  });
+
+  /* ---------- Чек ---------- */
+  const bill = { days: 'wd', banya: false, chan: false };
+  const fmt = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  const pad = n => String(n).padStart(2, '0');
+  const now = new Date();
+  $('[data-now]', map).textContent = `${pad(now.getDate())}.${pad(now.getMonth() + 1)}.${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  function printRow(row) {
+    row.hidden = false;
+    row.removeAttribute('data-new'); void row.offsetWidth; row.setAttribute('data-new', '');
+  }
+  function renderBill(changed) {
+    const house = bill.days === 'wd' ? 15000 : 20000;
+    $('[data-days-name]', map).textContent = bill.days === 'wd' ? 'будни' : 'пт–вс';
+    $('[data-days-price]', map).textContent = fmt(house);
+    $('[data-days-sum]', map).textContent = fmt(house);
+    ['banya', 'chan'].forEach(k => { const r = $(`[data-row="${k}"]`, map); if (bill[k]) { if (r.hidden || changed === k) printRow(r); } else r.hidden = true; });
+    if (changed === 'house') printRow($('[data-row="house"]', map));
+    const total = house + 4000 * (bill.banya + bill.chan);
+    $('[data-total]', map).textContent = fmt(total) + ' ₽';
+    $('[data-total-stub]', map).textContent = fmt(total) + ' ₽';
+  }
+  $$('.toggle', map).forEach(btn => btn.addEventListener('click', () => {
+    const k = btn.dataset.item, on = (bill[k] = !bill[k]);
+    btn.setAttribute('aria-pressed', on);
+    btn.textContent = on ? (k === 'banya' ? 'Баня в чеке' : 'Чан в чеке') : (k === 'banya' ? 'Добавить баню' : 'Добавить чан');
+    renderBill(on ? k : null);
+  }));
+  $$('input[name="days"]', map).forEach(r => r.addEventListener('change', () => { bill.days = r.value; renderBill('house'); }));
+  stub.addEventListener('click', () => {
+    const open = printer.classList.toggle('is-open');
+    stub.setAttribute('aria-expanded', open);
+  });
+  renderBill();
+
+  /* ---------- Цвет шкалы на светлой заглушке ---------- */
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting) rail('var(--ink)');
+    else rail(stand.dataset.state === 'hall' ? 'var(--ink)' : 'var(--ink-night)');
+  }, { rootMargin: '-50% 0px -50% 0px' }).observe($('#dalshe'));
 })();
